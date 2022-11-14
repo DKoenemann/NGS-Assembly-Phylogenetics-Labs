@@ -4,6 +4,8 @@
 
 2_NGSIntroCleaning.docx - A basic introduction to navigating and entering commands in the terminal. Finding the Desktop when using the Ubunut WSL can be difficult. This lab module will also show students how to download sequence data from GenBank and from the Sequence Read Archive (SRA). Students will also clean the SRA reach archive data and conduct quality checks. 
 
+2_Files.zip - The files manipulated in 2_NGSIntroductionCleaning.docx
+
 3_NGSPlastomeAssembly - The actual assembly of the chloroplast genome using the SRA reach archive and one plastome as a reference.
 
 3_Coverage.rmd - An R notebook containing some code for generating statistics to assess the assembly
