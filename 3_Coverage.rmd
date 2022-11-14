@@ -1,0 +1,87 @@
+
+```{r}
+library(tidyverse)
+library(magrittr)
+```
+
+```{r coveragehistograms}
+
+fileNames <- Sys.glob("*.csv")
+
+for (fileName in fileNames) {
+
+justname <- str_remove(fileName,
+                       "_trimmed.fq.gz.sam.bam.sorted.bam.csv")
+
+Cleaned <- read_delim(file = fileName,
+             delim = "\t",
+             col_names = FALSE) %>%
+    rename(Taxon = X1,
+           Position = X2,
+           CoverageDepth = X3) 
+
+Cleaned %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = CoverageDepth),
+                 binwidth = 10) +
+  theme_classic()
+
+ggsave(file = paste(justname,
+                    ".png",
+                    sep = ""),
+       plot = last_plot(),
+       device = "png",
+       width = 30,
+       height = 20,
+       units = "in",
+       dpi = 300)
+}
+
+```
+
+```{r coveragestats}
+fileNames <- Sys.glob("*.csv")
+
+FinalResult <- tibble()
+
+for (fileName in fileNames) {
+
+justname <- str_remove(fileName,
+                       "_trimmed.fq.gz.sam.bam.sorted.bam.csv")
+  
+Cleaned <- read_delim(file = fileName,
+             delim = "\t",
+             col_names = FALSE) %>%
+    rename(Taxon = X1,
+           Position = X2,
+           CoverageDepth = X3) 
+
+TotalCoverage <- Cleaned %>%
+  filter(CoverageDepth == 0) %>%
+  nrow() / nrow(Cleaned)
+
+TotalCoverage <- (1 - TotalCoverage)*100
+
+AverageDepth <- mean(Cleaned$CoverageDepth)
+
+Vals <- c(paste(justname), TotalCoverage, AverageDepth)
+
+IntermediateResult <- matrix(data = Vals,
+               nrow = 1,
+               ncol = 3) %>%
+  as_tibble()
+
+print(Vals)
+
+FinalResult <- bind_rows(FinalResult, IntermediateResult)
+}
+
+FinalResult %>% 
+  unique() %>%
+  rename(Taxon = V1,
+         PercentPositionsCovered = V2,
+         MeanCoverageDepth = V3) %>%
+  write_csv("CoverageStats.csv",
+            col_names = TRUE)
+
+```
